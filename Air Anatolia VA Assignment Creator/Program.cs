@@ -68,7 +68,7 @@ namespace Air_Anatolia_VA_Assignment_Creator
                 domesticOrInternational = Convert.ToInt32(Console.ReadLine());
             }
 
-            Console.WriteLine("Select the flight time by writing the corresponding number:\n0-1 hours = 0\n1-2 hours = 1\n 2-3 hours = 2\n3-4 hours = 3\n4-5 hours = 4\n5-6 hours = 5\n6-7 hours = 6\n7-8 hours = 7\n8-9 hours = 8\n9-10 hours = 9\n10-11 hours = 10\n11-12 hours = 11\n12-13 hours = 12\n13-14 hours = 13\n14+ hours = 14\n");
+            Console.WriteLine("Select the flight time by writing the corresponding number:\n0-1 hours = 0\n1-2 hours = 1\n2-3 hours = 2\n3-4 hours = 3\n4-5 hours = 4\n5-6 hours = 5\n6-7 hours = 6\n7-8 hours = 7\n8-9 hours = 8\n9-10 hours = 9\n10-11 hours = 10\n11-12 hours = 11\n12-13 hours = 12\n13-14 hours = 13\n14+ hours = 14\n");
             string input = Console.ReadLine();
             int flightTimeSelection = Convert.ToInt32(input) * 100;
 
