@@ -4,7 +4,6 @@ namespace Air_Anatolia_VA_Assignment_Creator
 {
     /*
      * TO-DO
-     * Add cargo vs passenger
      * fix empty input from user because humans?
      */
     internal class Program
