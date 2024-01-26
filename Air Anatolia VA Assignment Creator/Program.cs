@@ -45,7 +45,7 @@ namespace Air_Anatolia_VA_Assignment_Creator
                             deptime = parts[8],
                             arrtime = parts[9],
                             flighttime = Double.Parse(parts[10]) * 100,
-                            flighttype = Char.Parse(parts[13]),
+                            flighttype = parts[13],
                             daysofweek = ConvertStringToDaysOfWeekArray(parts[14]),
                         }));
                         ;
@@ -59,68 +59,84 @@ namespace Air_Anatolia_VA_Assignment_Creator
                 throw;
             }
 
-            Console.WriteLine("Write the ICAO of the departure airport, it should be 4 letters:\n");
-            string icaoSelection;
-            do
+            while (true)
             {
-                icaoSelection = Console.ReadLine().ToUpper();
-            } while (icaoSelection == null || icaoSelection.Length != 4 || icaoSelection.All(char.IsDigit));
-
-            int domesticOrInternational = 0;
-            if (icaoSelection.StartsWith("LT"))
-            {
-                Console.WriteLine("Select one of the following:\nDomestic = 0\nInternational = 1\n");
-                domesticOrInternational = Convert.ToInt32(Console.ReadLine());
-            }
-
-            Console.WriteLine("Select the flight time by writing the corresponding number:\n0-1 hours = 0\n1-2 hours = 1\n2-3 hours = 2\n3-4 hours = 3\n4-5 hours = 4\n5-6 hours = 5\n6-7 hours = 6\n7-8 hours = 7\n8-9 hours = 8\n9-10 hours = 9\n10-11 hours = 10\n11-12 hours = 11\n12-13 hours = 12\n13-14 hours = 13\n14+ hours = 14\n");
-            string input = Console.ReadLine();
-            int flightTimeSelection = Convert.ToInt32(input) * 100;
-
-            List<Flight> flights = new List<Flight>();
-            int wk = (int)DateTime.Now.DayOfWeek;
-
-            foreach (var selectedFlight in flightList.Values)
-            {
-                if (selectedFlight != null)
+                Console.WriteLine("\nWrite the ICAO of the departure airport, it should be 4 letters:");
+                string icaoSelection;
+                do
                 {
-                    if (Array.IndexOf(selectedFlight.daysofweek, wk) != -1)
+                    icaoSelection = Console.ReadLine().ToUpper();
+                } while (icaoSelection == null || icaoSelection.Length != 4 || icaoSelection.All(char.IsDigit));
+
+                string cargoSelection;
+                do
+                {
+                    Console.WriteLine("\nAre you looking for Passenger flight or Cargo flight? Selections available;\nP = Passenger\nC = Cargo");
+                    cargoSelection = Console.ReadLine().ToUpper();
+                } while (!(cargoSelection == null || cargoSelection != "P" || cargoSelection != "C"));
+
+                int domesticOrInternational = 0;
+                if (icaoSelection.StartsWith("LT"))
+                {
+                    Console.WriteLine("Select one of the following:\nDomestic = 0\nInternational = 1");
+                    domesticOrInternational = Convert.ToInt32(Console.ReadLine());
+                }
+
+                Console.WriteLine("\nSelect the flight time by writing the corresponding number:\n0-1 hours = 0\n1-2 hours = 1\n2-3 hours = 2\n3-4 hours = 3\n4-5 hours = 4\n5-6 hours = 5\n6-7 hours = 6\n7-8 hours = 7\n8-9 hours = 8\n9-10 hours = 9\n10-11 hours = 10\n11-12 hours = 11\n12-13 hours = 12\n13-14 hours = 13\n14+ hours = 14");
+                string input = Console.ReadLine();
+                int flightTimeSelection = Convert.ToInt32(input) * 100;
+
+                List<Flight> flights = new List<Flight>();
+                int wk = (int)DateTime.Now.DayOfWeek;
+
+                foreach (var selectedFlight in flightList.Values)
+                {
+                    if (selectedFlight != null)
                     {
-                        if (selectedFlight.depicao.StartsWith(icaoSelection))
+                        if (Array.IndexOf(selectedFlight.daysofweek, wk) != -1)
                         {
-                            if (domesticOrInternational == 0 && selectedFlight.arricao.StartsWith("LT"))
+                            if (selectedFlight.depicao.StartsWith(icaoSelection))
                             {
-                                if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= flightTimeSelection + 100)
+                                if (domesticOrInternational == 0 && selectedFlight.arricao.StartsWith("LT"))
+                                {
+                                    if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= flightTimeSelection + 100 && selectedFlight.flighttype == cargoSelection)
+                                    {
+                                        flights.Add(selectedFlight);
+                                    }
+                                }
+                                else if (domesticOrInternational == 1 && flightTimeSelection == 14 && selectedFlight.flighttime >= 1400 && selectedFlight.flighttype == cargoSelection)
+                                {
+                                    flights.Add(selectedFlight);
+                                }
+                                else if (domesticOrInternational == 1 && selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= (flightTimeSelection + 100) && selectedFlight.flighttype == cargoSelection)
                                 {
                                     flights.Add(selectedFlight);
                                 }
                             }
-                            else if (flightTimeSelection == 14 && selectedFlight.flighttime >= 1400)
-                            {
-                                flights.Add(selectedFlight);
-                            }
-                            else if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= (flightTimeSelection + 100))
-                            {
-                                flights.Add(selectedFlight);
-                            }
                         }
                     }
                 }
-            }
-            if (flights.Count > 0)
-            {
-                Console.WriteLine("\n\nHere is the flight assignment:\n");
+                if (flights.Count > 0)
+                {
+                    Console.WriteLine("\n\nHere is the flight assignment:\n");
 
-                Random rnd = new Random();
-                int assignedFlight = rnd.Next(0, flights.Count);
+                    Random rnd = new Random();
+                    int assignedFlight = rnd.Next(0, flights.Count);
 
-                Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time in XXXX UTC format:" + flights[assignedFlight].deptime + ", Arrival Time in XXXX UTC format: " + flights[assignedFlight].arrtime + " | " + flights[assignedFlight].flighttime);
-            }
-            else
-            {
-                Console.WriteLine("No flight could be found with the requested paramteres");
-            }
+                    Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time in XXXX UTC format:" + flights[assignedFlight].deptime + ", Arrival Time in XXXX UTC format: " + flights[assignedFlight].arrtime + " | " + flights[assignedFlight].flighttime);
+                }
+                else
+                {
+                    Console.WriteLine("\nNo flight could be found with the requested paramteres.\n");
+                }
 
+                Console.WriteLine("To exit, simply write 1, if you want to get another flight, press any other key then enter");
+                string exit = Console.ReadLine();
+                if (exit == "1")
+                {
+                    break;
+                }
+            }
         }
     }
 }

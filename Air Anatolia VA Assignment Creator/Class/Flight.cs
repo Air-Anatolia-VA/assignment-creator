@@ -18,7 +18,7 @@ namespace Air_Anatolia_VA_Assignment_Creator.Class
         internal string deptime;
         internal string arrtime;
         internal double flighttime;
-        internal char flighttype;
+        internal string flighttype;
         internal int[] daysofweek;
     }
 
