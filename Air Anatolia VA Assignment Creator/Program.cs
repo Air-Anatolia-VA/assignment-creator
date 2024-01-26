@@ -109,13 +109,20 @@ namespace Air_Anatolia_VA_Assignment_Creator
                     }
                 }
             }
+            if (flights.Count > 0)
+            {
+                Console.WriteLine("\n\nHere is the flight assignment:\n");
 
-            Console.WriteLine("\n\nHere is the flight assignment:\n");
+                Random rnd = new Random();
+                int assignedFlight = rnd.Next(0, flights.Count);
 
-            Random rnd = new Random();
-            int assignedFlight= rnd.Next(0, flights.Count);
+                Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time in XXXX UTC format:" + flights[assignedFlight].deptime + ", Arrival Time in XXXX UTC format: " + flights[assignedFlight].arrtime + " | " + flights[assignedFlight].flighttime);
+            }
+            else
+            {
+                Console.WriteLine("No flight could be found with the requested paramteres");
+            }
 
-            Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time in XXXX UTC format:" + flights[assignedFlight].deptime + ", Arrival Time in XXXX UTC format: " + flights[assignedFlight].arrtime + " | " + flights[assignedFlight].flighttime);
         }
     }
 }
