@@ -58,84 +58,242 @@ namespace Air_Anatolia_VA_Assignment_Creator
                 throw;
             }
 
-            while (true)
+            int numberOfFlightsToGenerate = 0;
+            do
             {
-                Console.WriteLine("\nWrite the ICAO of the departure airport, it should be 4 letters:");
-                string icaoSelection;
-                do
-                {
-                    icaoSelection = Console.ReadLine().ToUpper();
-                } while (icaoSelection == null || icaoSelection.Length != 4 || icaoSelection.All(char.IsDigit));
-
-                string cargoSelection;
-                do
-                {
-                    Console.WriteLine("\nAre you looking for Passenger flight or Cargo flight? Selections available;\nP = Passenger\nC = Cargo");
-                    cargoSelection = Console.ReadLine().ToUpper();
-                } while (!(cargoSelection == null || cargoSelection != "P" || cargoSelection != "C"));
-
-                int domesticOrInternational = 0;
-                if (icaoSelection.StartsWith("LT"))
-                {
-                    Console.WriteLine("Select one of the following:\nDomestic = 0\nInternational = 1");
-                    domesticOrInternational = Convert.ToInt32(Console.ReadLine());
-                }
-
-                Console.WriteLine("\nSelect the flight time by writing the corresponding number:\n0-1 hours = 0\n1-2 hours = 1\n2-3 hours = 2\n3-4 hours = 3\n4-5 hours = 4\n5-6 hours = 5\n6-7 hours = 6\n7-8 hours = 7\n8-9 hours = 8\n9-10 hours = 9\n10-11 hours = 10\n11-12 hours = 11\n12-13 hours = 12\n13-14 hours = 13\n14+ hours = 14");
+                Console.WriteLine("\nPlease speciify how many random flight you would like to generate (1-10):");
+                
                 string input = Console.ReadLine();
-                int flightTimeSelection = Convert.ToInt32(input) * 100;
-
-                List<Flight> flights = new List<Flight>();
-                int wk = (int)DateTime.Now.DayOfWeek;
-
-                foreach (var selectedFlight in flightList.Values)
+                
+                if (int.TryParse(input, out _))
                 {
-                    if (selectedFlight != null)
+                    numberOfFlightsToGenerate = Convert.ToInt32(input);
+                }
+                else
+                {
+                    continue;
+                }
+            } while (numberOfFlightsToGenerate < 1 || numberOfFlightsToGenerate > 10);
+            
+
+            Console.WriteLine("\n\nYou have 2 options, either you can select the length of the flight or select from 3 options.\n0 = Specify exact time\n1 = Select from time range");
+            int flightTimeTypeSelection = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("\n\nWrite the ICAO of the departure airport, it should be 4 letters:");
+
+            string icaoSelection;
+
+            do
+            {
+                icaoSelection = Console.ReadLine().ToUpper();
+            } while (icaoSelection == null || icaoSelection.Length != 4 || icaoSelection.All(char.IsDigit));
+
+            string cargoSelection;
+
+            do
+            {
+                Console.WriteLine("\n\nAre you looking for Passenger flight or Cargo flight? Selections available;\nP = Passenger\nC = Cargo");
+                cargoSelection = Console.ReadLine().ToUpper();
+            } while (!(cargoSelection == null || cargoSelection == "P" || cargoSelection == "C"));
+
+            int domesticOrInternational = 0;
+
+            if (icaoSelection.StartsWith("LT"))
+            {
+                Console.WriteLine("\n\nSelect one of the following:\n0 = Domestic\n1 = International");
+                domesticOrInternational = Convert.ToInt32(Console.ReadLine());
+            }
+
+            int flightTimeSelection = 0;
+
+            if (flightTimeTypeSelection == 0)
+            {
+                Console.WriteLine("\nSelect the flight time by writing the corresponding number:\n0 = 0-1 hours\n1 = 1-2 hours\n2 = 2-3 hours\n3 = 3-4 hours\n4 = 4-5 hours\n5 = 5-6 hours\n6 = 6-7 hours\n7 = 7-8 hours\n8 = 8-9 hours\n9 = 9-10 hours\n10 = 10-11 hours\n11 = 11-12 hours\n12 = 12-13 hours\n13 = 13-14 hours\n14 = 14+ hours");
+                flightTimeSelection = Convert.ToInt32(Console.ReadLine()) * 100;
+            }
+            else if (flightTimeTypeSelection == 1)
+            {
+                if (domesticOrInternational == 0)
+                {
+                    do
                     {
-                        if (Array.IndexOf(selectedFlight.daysofweek, wk) != -1)
+                        Console.WriteLine("\n\n0 = short domestic flight (0-1 hours)\n1 = medium domestic flight (1-2 hours)\n2 = long domestic flight (2-3 hours)\n3 = mix of short + medium flights");
+                        flightTimeSelection = Convert.ToInt32(Console.ReadLine());
+                    } while (flightTimeSelection < 0 || flightTimeSelection > 3);
+                }
+                else if (domesticOrInternational == 1)
+                {
+                    do
+                    {
+                        Console.WriteLine("\n\n0 = short flight (0-3 hours)\n1 = medium flight (3-6 hours)\n2 = long flight (6-13 hours)\n3 = ultra long flight (13+ hours)\n4 = mix of short + medium flights");
+                        flightTimeSelection = Convert.ToInt32(Console.ReadLine());
+                    } while (flightTimeSelection < 0 || flightTimeSelection > 4);  
+                }
+            }
+
+
+            List<Flight> flights = new List<Flight>();
+            int wk = (int)DateTime.Now.DayOfWeek;
+
+            foreach (var selectedFlight in flightList.Values)
+            {
+                if (selectedFlight != null)
+                {
+                    if (Array.IndexOf(selectedFlight.daysofweek, wk) != -1)
+                    {
+                        if (selectedFlight.depicao.StartsWith(icaoSelection))
                         {
-                            if (selectedFlight.depicao.StartsWith(icaoSelection))
+                            if (domesticOrInternational == 0 && selectedFlight.arricao.StartsWith("LT") && selectedFlight.flighttype == cargoSelection)
                             {
-                                if (domesticOrInternational == 0 && selectedFlight.arricao.StartsWith("LT"))
+                                if (flightTimeTypeSelection == 0)
                                 {
-                                    if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= flightTimeSelection + 100 && selectedFlight.flighttype == cargoSelection)
+                                    if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= flightTimeSelection + 100)
                                     {
                                         flights.Add(selectedFlight);
                                     }
                                 }
-                                else if (domesticOrInternational == 1 && flightTimeSelection == 14 && selectedFlight.flighttime >= 1400 && selectedFlight.flighttype == cargoSelection)
+                                else if (flightTimeTypeSelection == 1)
                                 {
-                                    flights.Add(selectedFlight);
+                                    switch (flightTimeSelection)
+                                    {
+                                        case 0:
+                                            if (selectedFlight.flighttime >= 0 && selectedFlight.flighttime < 100)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 1:
+                                            if (selectedFlight.flighttime >= 100 && selectedFlight.flighttime < 200)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 2:
+                                            if (selectedFlight.flighttime >= 200 && selectedFlight.flighttime < 300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 3:
+                                            if ((selectedFlight.flighttime >= 0 && selectedFlight.flighttime < 100) || (selectedFlight.flighttime >= 100 && selectedFlight.flighttime < 200))
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
-                                else if (domesticOrInternational == 1 && selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime <= (flightTimeSelection + 100) && selectedFlight.flighttype == cargoSelection)
+                            }
+                            else if (domesticOrInternational == 1 && !selectedFlight.arricao.StartsWith("LT") && selectedFlight.flighttype == cargoSelection)
+                            {
+                                if (flightTimeTypeSelection == 0)
                                 {
-                                    flights.Add(selectedFlight);
+                                    if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime < flightTimeSelection + 100)
+                                    {
+                                        flights.Add(selectedFlight);
+                                    }
+                                }
+                                else if (flightTimeTypeSelection == 1)
+                                {
+                                    switch (flightTimeSelection)
+                                    {
+                                        case 0:
+                                            if (selectedFlight.flighttime >= 0 && selectedFlight.flighttime < 300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 1:
+                                            if (selectedFlight.flighttime >= 300 && selectedFlight.flighttime < 600)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 2:
+                                            if (selectedFlight.flighttime >= 600 && selectedFlight.flighttime < 1300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 3:
+                                            if (selectedFlight.flighttime >= 1300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 4:
+                                            if ((selectedFlight.flighttime >= 0 && selectedFlight.flighttime < 300) || (selectedFlight.flighttime >= 300 && selectedFlight.flighttime < 600))
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                if (flights.Count > 0)
+            }
+            if (flights.Count > 0)
+            {
+                Random rnd = new Random();
+
+                if (numberOfFlightsToGenerate == 1)
                 {
                     Console.WriteLine("\n\nHere is the flight assignment:\n");
-
-                    Random rnd = new Random();
                     int assignedFlight = rnd.Next(0, flights.Count);
 
-                    Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time in XXXX UTC format:" + flights[assignedFlight].deptime + ", Arrival Time in XXXX UTC format: " + flights[assignedFlight].arrtime + " | " + flights[assignedFlight].flighttime);
+                    string flightTime = Convert.ToString(flights[assignedFlight].flighttime);
+                    if (Convert.ToInt32(flights[assignedFlight].flighttime) < 100)
+                    {
+                        flightTime = "00:" + Convert.ToInt32(flights[assignedFlight].flighttime).ToString();
+                    }
+                    else if (Convert.ToInt32(flights[assignedFlight].flighttime) < 1000)
+                    {
+                        flightTime = "0" + Convert.ToInt32(flights[assignedFlight].flighttime).ToString()[0] + ":" + Convert.ToInt32(flights[assignedFlight].flighttime).ToString().Substring(1);
+                    }
+                    else
+                    {
+                        flightTime = flightTime[0] + flightTime[1] + ":" + flightTime[2] + flightTime[3];
+                    }
+
+                    Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time: " + flights[assignedFlight].deptime + ", Arrival Time: " + flights[assignedFlight].arrtime + "z | " + flightTime);
                 }
                 else
                 {
-                    Console.WriteLine("\nNo flight could be found with the requested paramteres.\n");
-                }
+                    Console.WriteLine("\n\nHere are the flight assignments:\n");
+                    int totalFlights = flights.Count < numberOfFlightsToGenerate ? flights.Count : numberOfFlightsToGenerate;
+                    for (int i = 0; i < totalFlights; i++)
+                    {
+                        int assignedFlight = rnd.Next(0, flights.Count);
+                        string flightTime = Convert.ToInt32(flights[assignedFlight].flighttime).ToString();
+                        if (Convert.ToInt32(flights[assignedFlight].flighttime) < 100)
+                        {
+                            flightTime = "00" + Convert.ToInt32(flights[assignedFlight].flighttime).ToString();
+                        }
+                        else if (Convert.ToInt32(flights[assignedFlight].flighttime) < 1000)
+                        {
+                            flightTime = "0" + Convert.ToInt32(flights[assignedFlight].flighttime).ToString()[0] + ":" + Convert.ToInt32(flights[assignedFlight].flighttime).ToString().Substring(1);
+                        }
+                        else
+                        {
+                            flightTime = flightTime[..2] + ":" + flightTime.Substring(2);
+                        }
 
-                Console.WriteLine("To exit, simply write 1, if you want to get another flight, press any other key then enter");
-                string exit = Console.ReadLine();
-                if (exit == "1")
-                {
-                    break;
+                        Console.WriteLine(flights[assignedFlight].code + " " + flights[assignedFlight].flightnum + " | " + flights[assignedFlight].depicao.ToUpper() + " - " + flights[assignedFlight].arricao.ToUpper() + " | Dep Time: " + flights[assignedFlight].deptime + "z, Arrival Time: " + flights[assignedFlight].arrtime + "z | " + flightTime);
+                    }
                 }
             }
+            else
+            {
+                Console.WriteLine("\nNo flight could be found with the requested paramteres.\n");
+            }
+
+            Console.WriteLine("Press enter key to exit");
+            string exit = Console.ReadLine();
         }
     }
 }
