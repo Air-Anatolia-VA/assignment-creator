@@ -239,7 +239,7 @@ namespace Air_Anatolia_VA_Assignment_Creator
                                     }
                                 }
                             }
-                            else if (flightTimeTypeSelection == 2 && selectedFlight.flighttype == cargoSelection)
+                            else if (domesticOrInternational == 2 && selectedFlight.flighttype == cargoSelection)
                             {
                                 if (flightTimeTypeSelection == 0)
                                 {
