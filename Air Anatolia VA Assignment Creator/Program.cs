@@ -1,4 +1,6 @@
 ﻿using Air_Anatolia_VA_Assignment_Creator.Class;
+using System.IO;
+using System.Reflection;
 
 namespace Air_Anatolia_VA_Assignment_Creator
 {
@@ -26,7 +28,11 @@ namespace Air_Anatolia_VA_Assignment_Creator
 
             try
             {
-                using (StreamReader reader = new StreamReader("schedules.csv"))
+                var assembly = Assembly.GetExecutingAssembly();
+                var resourceName = "Air_Anatolia_VA_Assignment_Creator.data.schedules.csv";
+
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                using (StreamReader reader = new StreamReader(stream))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
@@ -96,11 +102,11 @@ namespace Air_Anatolia_VA_Assignment_Creator
                 cargoSelection = Console.ReadLine().ToUpper();
             } while (!(cargoSelection == null || cargoSelection == "P" || cargoSelection == "C"));
 
-            int domesticOrInternational = 0;
+            int domesticOrInternational = 1;
 
             if (icaoSelection.StartsWith("LT"))
             {
-                Console.WriteLine("\n\nSelect one of the following:\n0 = Domestic\n1 = International");
+                Console.WriteLine("\n\nSelect one of the following:\n0 = Domestic\n1 = International\n2 = Mix of Domestic and International (REALISTIC)");
                 domesticOrInternational = Convert.ToInt32(Console.ReadLine());
             }
 
@@ -121,7 +127,7 @@ namespace Air_Anatolia_VA_Assignment_Creator
                         flightTimeSelection = Convert.ToInt32(Console.ReadLine());
                     } while (flightTimeSelection < 0 || flightTimeSelection > 3);
                 }
-                else if (domesticOrInternational == 1)
+                else if (domesticOrInternational == 1 || domesticOrInternational == 2)
                 {
                     do
                     {
@@ -186,6 +192,54 @@ namespace Air_Anatolia_VA_Assignment_Creator
                                 }
                             }
                             else if (domesticOrInternational == 1 && !selectedFlight.arricao.StartsWith("LT") && selectedFlight.flighttype == cargoSelection)
+                            {
+                                if (flightTimeTypeSelection == 0)
+                                {
+                                    if (selectedFlight.flighttime >= flightTimeSelection && selectedFlight.flighttime < flightTimeSelection + 100)
+                                    {
+                                        flights.Add(selectedFlight);
+                                    }
+                                }
+                                else if (flightTimeTypeSelection == 1)
+                                {
+                                    switch (flightTimeSelection)
+                                    {
+                                        case 0:
+                                            if (selectedFlight.flighttime >= 0 && selectedFlight.flighttime < 300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 1:
+                                            if (selectedFlight.flighttime >= 300 && selectedFlight.flighttime < 600)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 2:
+                                            if (selectedFlight.flighttime >= 600 && selectedFlight.flighttime < 1300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 3:
+                                            if (selectedFlight.flighttime >= 1300)
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        case 4:
+                                            if ((selectedFlight.flighttime >= 0 && selectedFlight.flighttime < 300) || (selectedFlight.flighttime >= 300 && selectedFlight.flighttime < 600))
+                                            {
+                                                flights.Add(selectedFlight);
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                            else if (flightTimeTypeSelection == 2 && selectedFlight.flighttype == cargoSelection)
                             {
                                 if (flightTimeTypeSelection == 0)
                                 {
